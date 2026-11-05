@@ -80,3 +80,121 @@ The saved run used `D:\Raw data.csv` and wrote results to `D:\BFO_XGBoost_Result
 ## Status
 
 Exploratory research portfolio project. Further work includes a final Ridge test comparison and external validation.
+
+## Graphs
+
+## XGBoost Diagnostic and Interpretation Gallery
+
+The following figures describe the XGBoost analysis. Ridge comparisons are reported in the results above. Training performance should be interpreted alongside validation and held-out testing.
+
+### 1. Training predictions
+
+![XGBoost training parity](figures/01_Training_Parity.png)
+
+### 2. Out-of-fold predictions
+
+These predictions use the selected hyperparameters and are diagnostic estimates, separate from the nested validation reported above.
+
+![Training out-of-fold parity](figures/02_Training_OOF_Parity.png)
+
+### 3. Held-out testing predictions
+
+![Testing parity](figures/03_Testing_Parity.png)
+
+### 4. Training and testing comparison
+
+![Training and testing comparison](figures/04_Training_Testing_Comparison.png)
+
+### 5. Residuals versus predictions
+
+![Residuals versus predictions](figures/05_Residual_Versus_Prediction.png)
+
+### 6. Residuals versus actual efficiency
+
+![Residuals versus actual efficiency](figures/06_Residual_Versus_Actual.png)
+
+### 7. Residual distribution
+
+![Residual histogram](figures/07_Residual_Histogram.png)
+
+### 8. Residual Q-Q plot
+
+![Residual Q-Q plot](figures/08_Residual_QQ_Plot.png)
+
+### 9. Sorted test predictions
+
+Observations are sorted by actual efficiency, not by reaction time.
+
+![Sorted testing predictions](figures/09_Sorted_Testing_Predictions.png)
+
+### 10. Absolute prediction errors
+
+![Absolute error versus actual efficiency](figures/10_Absolute_Error_Versus_Actual.png)
+
+### 11. Cumulative error distribution
+
+![Absolute error cumulative distribution](figures/11_Absolute_Error_ECDF.png)
+
+### 12. Actual and predicted distributions
+
+![Testing target distributions](figures/12_Testing_Target_Distributions.png)
+
+### 13. Error distribution comparison
+
+![Error distribution comparison](figures/13_Error_Distribution_Comparison.png)
+
+### 14. Residual scale
+
+![Residual scale plot](figures/14_Residual_Scale_Plot.png)
+
+### 15. Errors across experimental features
+
+![Numeric feature residuals](figures/15_Numeric_Feature_Residuals.png)
+
+### 16. Training-data correlations
+
+Correlations describe associations within the training data, not causal relationships.
+
+![Training correlation matrix](figures/16_Training_Correlation_Matrix.png)
+
+### 17. Training and testing feature distributions
+
+![Numeric feature distributions](figures/17_Numeric_Feature_Distributions.png)
+
+### 18. Cross-validated permutation importance
+
+Error bars show variation across folds. These diagnostics reuse the selected hyperparameters.
+
+![Cross-validated permutation importance](figures/18_Cross_Validated_Permutation_Importance.png)
+
+### 19. XGBoost gain importance
+
+![XGBoost gain importance](figures/19_XGBoost_Gain_Importance.png)
+
+### 20. Grouped learning curve
+
+![Grouped learning curve](figures/20_Grouped_Learning_Curve.png)
+
+### 21. Validation-fold stability
+
+![Validation fold stability](figures/21_Validation_Fold_Stability.png)
+
+### 22. SHAP feature contributions
+
+SHAP values explain the fitted model's predictions; they do not establish chemical mechanisms.
+
+![Training SHAP beeswarm](figures/22_Training_SHAP_Beeswarm.png)
+
+### 23. Mean absolute SHAP importance
+
+![Training SHAP importance](figures/23_Training_SHAP_Importance.png)
+
+### 24. Partial dependence
+
+These curves describe the fitted model's average response to individual features and should be interpreted cautiously where experimental coverage is sparse.
+
+![Training numeric partial dependence](figures/24_Training_Numeric_Partial_Dependence.png)
+
+### 25. Training, validation, and testing dashboard
+
+![Training validation testing dashboard](figures/25_Training_Validation_Testing_Dashboard.png)

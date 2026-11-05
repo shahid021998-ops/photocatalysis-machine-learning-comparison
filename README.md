@@ -2,7 +2,7 @@
 
 **Author: Shahid Ali**
 
-Independent computational reanalysis of published experimental data on malachite green removal using bismuth ferrite-based photocatalysts.
+Computational reanalysis of published experimental data on malachite green removal using bismuth ferrite-based photocatalysts.
 
 ## Objective
 
@@ -10,12 +10,12 @@ Compare Ridge regression and XGBoost for predicting degradation efficiency, with
 
 ## Data source and credit
 
-The experimental data were produced by the original researchers, not by me.
+The original researchers produced the experimental data. My contribution is the computational reanalysis, model comparison, validation, and visualization.
 
 Jaffari et al., “Machine learning approaches to predict the photocatalytic performance of bismuth ferrite-based materials in the removal of malachite green.”
 
-- Paper: https://doi.org/10.1016/j.jhazmat.2022.130031
-- Original data and code: https://github.com/ZeeshanHJ/Photocatalytic_Performance_Prediction
+- [Original paper](https://doi.org/10.1016/j.jhazmat.2022.130031)
+- [Original dataset and code](https://github.com/ZeeshanHJ/Photocatalytic_Performance_Prediction)
 
 Download `Raw data.csv` from the original repository. The raw dataset is not redistributed here.
 
@@ -24,16 +24,21 @@ Download `Raw data.csv` from the original repository. The raw dataset is not red
 - Dataset: 1,200 observations.
 - Target: degradation efficiency (%).
 - Final concentration was excluded from predictors to prevent target leakage.
+- Valid zero values, including experimental controls, were preserved.
 - Categorical features were one-hot encoded within each training pipeline.
 - Measurements with matching recorded experimental conditions, excluding time, were assigned to the same group.
-- A held-out partition contained 8 condition groups; the training partition contained 31 groups.
-- Nested validation used five outer folds and up to four inner grouped folds on the training partition.
+- The training partition contained 960 observations across 31 condition groups.
+- The held-out testing partition contained 240 observations across 8 condition groups.
+- Nested validation used five outer folds and four inner grouped folds on the training partition.
 - Ridge and XGBoost were compared with mean and median baselines.
 - Exact duplicate records were retained in the primary analysis and removed in a sensitivity analysis.
+- Both duplicate scenarios used the same outer condition-group assignments.
 
 ## Results
 
-Nested grouped validation on the training partition:
+### Nested grouped validation
+
+The following results were obtained on the training partition using nested grouped cross-validation:
 
 | Duplicate handling | Model | Pooled R² | MAE | RMSE |
 |---|---|---:|---:|---:|
@@ -42,52 +47,81 @@ Nested grouped validation on the training partition:
 | Removed | Ridge | 0.711 | 11.79 | 15.65 |
 | Removed | XGBoost | 0.600 | 13.47 | 18.44 |
 
-MAE and RMSE are measured in efficiency percentage points. The two duplicate scenarios contain different evaluation-row counts; see `Duplicate_Sensitivity_Common_Rows.csv` for comparison on identical rows.
+MAE and RMSE are measured in efficiency percentage points.
 
-XGBoost achieved R² = 0.632, MAE = 16.32, and RMSE = 19.12 on the held-out partition. A final held-out Ridge evaluation has not yet been completed.
+The duplicate-retained scenario evaluates 960 observations, while the duplicate-removed scenario evaluates 826 observations. For a direct comparison on identical evaluation rows, see `Duplicate_Sensitivity_Common_Rows.csv`.
 
-**Main finding:** Ridge outperformed XGBoost under the nested grouped validation design.
+**Main finding:** Ridge outperformed XGBoost under this nested grouped validation design.
 
 ![Nested model comparison](Nested_Model_Comparison.png)
+
+### Held-out XGBoost evaluation
+
+| Metric | Result |
+|---|---:|
+| R² | 0.632 |
+| MAE | 16.32 percentage points |
+| RMSE | 19.12 percentage points |
+| Mean prediction bias | +7.30 percentage points |
+| Mean-baseline MAE | 27.54 percentage points |
+
+A final held-out Ridge evaluation has not yet been completed.
+
+### Error analysis
+
+XGBoost showed substantial errors on the no-catalyst control and some experimental conditions involving 2 wt% Pd-BFO. These failures are retained and reported rather than removed to improve scores.
 
 ## Repository contents
 
 - `Shahid_Ali_Photocatalysis_ML_Comparison.ipynb`: modelling, diagnostics, and nested validation.
-- `Nested_Summary.csv`: pooled and fold-level summary statistics.
+- `Nested_Summary.csv`: pooled metrics and summaries across validation folds.
 - `Nested_Fold_Metrics.csv`: individual outer-fold evaluation metrics.
 - `Duplicate_Sensitivity_Common_Rows.csv`: duplicate sensitivity on matching evaluation rows.
 - `Nested_Model_Comparison.png`: comparison of nested validation MAE.
+- `figures/`: 25 XGBoost diagnostic and interpretation figures.
+- `requirements.txt`: Python dependencies.
 
 ## Running the notebook
 
-1. Install Python packages: pandas, numpy, matplotlib, scipy, scikit-learn, xgboost, shap, and joblib.
-2. Download the original `Raw data.csv`.
-3. Open the notebook in VS Code with Jupyter support.
+1. Install dependencies with `pip install -r requirements.txt`.
+2. Download the original `Raw data.csv` from the authors’ repository.
+3. Open `Shahid_Ali_Photocatalysis_ML_Comparison.ipynb` in VS Code with Python and Jupyter support.
 4. Change `PATH` to your dataset location and `OUT` to your preferred output directory.
 5. Run the first cell, followed by the nested-validation cell.
 
-The saved run used `D:\Raw data.csv` and wrote results to `D:\BFO_XGBoost_Results`. The first cell generates 25 figures in PNG and PDF formats.
+The saved run used `D:\Raw data.csv` and wrote results to `D:\BFO_XGBoost_Results`.
+
+The first cell generates 25 figures in PNG and PDF formats. The second cell performs nested grouped validation, baseline comparisons, duplicate sensitivity analysis, and error breakdowns.
+
+Dependencies are currently unpinned, so results may vary across package versions.
 
 ## Limitations
 
-- Condition groups are proxies, not verified experiment identifiers.
+- The 1,200 observations are not 1,200 independent experiments.
+- Condition groups are proxies based on recorded features, not verified experiment identifiers.
+- Some held-out groups can contain catalyst categories absent from training.
 - Strong XGBoost training performance did not translate into equally strong validation performance.
 - XGBoost performed poorly on the no-catalyst control.
 - The first cell’s ordinary out-of-fold diagnostics reuse tuned parameters; the second cell performs nested tuning.
-- Dataset inspection informed the analysis, and the held-out results have already been inspected.
+- Permutation importance and learning-curve diagnostics also reuse selected hyperparameters.
+- Feature importance, SHAP values, and partial dependence describe model behaviour and do not establish causal chemical mechanisms.
+- The provenance of exact duplicate records has not been resolved; retaining and removing them are sensitivity scenarios.
+- Dataset inspection informed the analysis, and held-out results have already been inspected.
 - Results describe internal validation on this dataset; external validation remains outstanding.
 
 ## Status
 
-Exploratory research portfolio project. Further work includes a final Ridge test comparison and external validation.
-
-## Graphs
+Exploratory research portfolio project. Further work includes a final Ridge test comparison, recording package versions, and external validation.
 
 ## XGBoost Diagnostic and Interpretation Gallery
 
-The following figures describe the XGBoost analysis. Ridge comparisons are reported in the results above. Training performance should be interpreted alongside validation and held-out testing.
+The following 25 figures describe the XGBoost analysis. Ridge comparisons are reported in the results above.
+
+Training performance should be interpreted alongside validation and held-out testing. These figures are not all outputs of nested cross-validation.
 
 ### 1. Training predictions
+
+Predictions for observations used to fit the selected XGBoost model.
 
 ![XGBoost training parity](figures/01_Training_Parity.png)
 
@@ -99,6 +133,8 @@ These predictions use the selected hyperparameters and are diagnostic estimates,
 
 ### 3. Held-out testing predictions
 
+Predictions for the testing partition, whose condition groups were excluded from training.
+
 ![Testing parity](figures/03_Testing_Parity.png)
 
 ### 4. Training and testing comparison
@@ -106,6 +142,8 @@ These predictions use the selected hyperparameters and are diagnostic estimates,
 ![Training and testing comparison](figures/04_Training_Testing_Comparison.png)
 
 ### 5. Residuals versus predictions
+
+Residuals are calculated as actual efficiency minus predicted efficiency.
 
 ![Residuals versus predictions](figures/05_Residual_Versus_Prediction.png)
 
@@ -118,6 +156,8 @@ These predictions use the selected hyperparameters and are diagnostic estimates,
 ![Residual histogram](figures/07_Residual_Histogram.png)
 
 ### 8. Residual Q-Q plot
+
+This plot compares the test-residual distribution with a normal distribution. Normal-looking residuals alone do not establish predictive reliability.
 
 ![Residual Q-Q plot](figures/08_Residual_QQ_Plot.png)
 
@@ -133,6 +173,8 @@ Observations are sorted by actual efficiency, not by reaction time.
 
 ### 11. Cumulative error distribution
 
+The curve shows the fraction of test observations with absolute errors at or below each threshold.
+
 ![Absolute error cumulative distribution](figures/11_Absolute_Error_ECDF.png)
 
 ### 12. Actual and predicted distributions
@@ -140,6 +182,8 @@ Observations are sorted by actual efficiency, not by reaction time.
 ![Testing target distributions](figures/12_Testing_Target_Distributions.png)
 
 ### 13. Error distribution comparison
+
+Training, ordinary out-of-fold, testing, and mean-baseline errors are compared.
 
 ![Error distribution comparison](figures/13_Error_Distribution_Comparison.png)
 
@@ -163,25 +207,31 @@ Correlations describe associations within the training data, not causal relation
 
 ### 18. Cross-validated permutation importance
 
-Error bars show variation across folds. These diagnostics reuse the selected hyperparameters.
+Importance measures the increase in validation MAE after a feature is shuffled. Error bars show variation across folds. These diagnostics reuse the selected hyperparameters.
 
 ![Cross-validated permutation importance](figures/18_Cross_Validated_Permutation_Importance.png)
 
 ### 19. XGBoost gain importance
 
+Normalized gain importance is reported for encoded model features.
+
 ![XGBoost gain importance](figures/19_XGBoost_Gain_Importance.png)
 
 ### 20. Grouped learning curve
+
+Training subsets are selected by condition group. The shaded band represents variation in validation MAE across folds, not a confidence interval.
 
 ![Grouped learning curve](figures/20_Grouped_Learning_Curve.png)
 
 ### 21. Validation-fold stability
 
+These fold errors use the selected XGBoost parameters and are separate from the nested outer-fold results.
+
 ![Validation fold stability](figures/21_Validation_Fold_Stability.png)
 
 ### 22. SHAP feature contributions
 
-SHAP values explain the fitted model's predictions; they do not establish chemical mechanisms.
+SHAP values explain the fitted model’s predictions on training observations; they do not establish chemical mechanisms.
 
 ![Training SHAP beeswarm](figures/22_Training_SHAP_Beeswarm.png)
 
@@ -191,10 +241,12 @@ SHAP values explain the fitted model's predictions; they do not establish chemic
 
 ### 24. Partial dependence
 
-These curves describe the fitted model's average response to individual features and should be interpreted cautiously where experimental coverage is sparse.
+These curves describe the fitted model’s average response to individual features. Interpret them cautiously where experimental coverage is sparse or feature combinations are unrealistic.
 
 ![Training numeric partial dependence](figures/24_Training_Numeric_Partial_Dependence.png)
 
 ### 25. Training, validation, and testing dashboard
+
+The dashboard summarizes training fit, ordinary out-of-fold predictions, and held-out testing. Nested validation results are reported separately above.
 
 ![Training validation testing dashboard](figures/25_Training_Validation_Testing_Dashboard.png)

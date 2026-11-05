@@ -2,7 +2,7 @@
 
 **Author: Shahid Ali**
 
-Computational reanalysis of published experimental data on malachite green removal using bismuth ferrite-based photocatalysts.
+Machine Learning reanalysis of experimental data on malachite green removal using bismuth ferrite-based photocatalysts.
 
 ## Objective
 
